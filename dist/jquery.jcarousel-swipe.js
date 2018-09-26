@@ -102,17 +102,19 @@
                 currentTouch = getTouches(event);
                 var xDiff = Math.abs(startTouch[xKey] - currentTouch[xKey]);
                 var yDiff = Math.abs(startTouch[yKey] - currentTouch[yKey]);
+                var $disableTarget = false;
 
                 if (started || (!self._options.draggable && xDiff > 10 && xDiff > yDiff)) {
                     var newTarget = self._getNewTarget(startTouch[xKey] - currentTouch[xKey] > 0);
                     newTarget = self._instance._options.wrap === 'circular' ? newTarget.relative : newTarget.static;
 
                     if (startTarget === event.target) {
-                        $(event.target).on("click.disable", function (event) {
+                        $disableTarget = $(event.target);
+                        $disableTarget.on("click.disable", function (event) {
                             event.stopImmediatePropagation();
                             event.stopPropagation();
                             event.preventDefault();
-                            $(event.target).off("click.disable");
+                            $disableTarget.off("click.disable");
                         });
                     }
 
@@ -129,6 +131,9 @@
                         }
                     });
 
+                    if ($disableTarget) {
+                        setTimeout(function () { $disableTarget.off("click.disable"); }, 0);
+                    }
                 }
 
                 $(document).off('touchmove.jcarouselSwipe mousemove.jcarouselSwipe');
